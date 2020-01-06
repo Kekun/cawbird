@@ -344,6 +344,7 @@ load_timeline_tweets_done  (GObject *source_object,
     JsonNode *node = json_array_get_element (root_arr, i - 1);
     JsonObject *obj = json_node_get_object (node);
     self->last_home_id = json_object_get_int_member (obj, "id");
+    g_debug("New timeline tweet with ID %lld", self->last_home_id);
     stream_tweet(self, CB_STREAM_MESSAGE_TWEET, node);
   }
 
@@ -420,6 +421,7 @@ load_mentions_tweets_done  (GObject *source_object,
     JsonNode *node = json_array_get_element (root_arr, i - 1);
     JsonObject *obj = json_node_get_object (node);
     self->last_mentions_id = json_object_get_int_member (obj, "id");
+    g_debug("New mention tweet with ID %lld", self->last_mentions_id);
     stream_tweet(self, CB_STREAM_MESSAGE_MENTION, node);
   }
 
@@ -497,6 +499,7 @@ load_favourited_tweets_done  (GObject *source_object,
     JsonNode *node = json_array_get_element (root_arr, i - 1);
     JsonObject *obj = json_node_get_object (node);
     self->last_favourited_id = json_object_get_int_member (obj, "id");
+    g_debug("New favourited tweet with ID %lld", self->last_favourited_id);
     stream_tweet(self, CB_STREAM_MESSAGE_EVENT_FAVORITE, node);
   }
 
@@ -604,7 +607,7 @@ load_dm_tweets_done  (GObject *source_object,
     }
 
     self->last_dm_id = id;
-    g_debug("New DM with type: %s", type);
+    g_debug("New DM with type %s and ID %lld", type, id);
     stream_tweet (self, message_type, node);
   }
 
