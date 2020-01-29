@@ -60,17 +60,22 @@ public class Account : GLib.Object {
     if (db != null)
       return;
 
+    debug("Initialising database");
     this.db = new Sql.Database (Dirs.config (@"accounts/$id.db"),
                                 Sql.ACCOUNTS_INIT_FILE,
                                 Sql.ACCOUNTS_SQL_VERSION);
+    debug("Creating user counter");
     user_counter = new Cb.UserCounter ();
+    debug("Loading filters");
     this.load_filters ();
 
     if (this.migration_date < 0 && Cawbird.db != null) {
+      debug("Checking Cawbird migration");
       this.migration_date = Cawbird.db.select ("accounts") .cols ("migrated") .where_eqi ("id", this.id) .once_i64 ();
     }
 
     if (this.migration_date == 0) {
+      debug("Migrating Cawbird account");
       this.migrate_from_corebird ();
     }
   }
@@ -84,21 +89,29 @@ public class Account : GLib.Object {
    *                     RestProxy object.
    */
   public void init_proxy (bool load_secrets = true, bool force = false) {
-    if (proxy != null && !force)
+    debug("entering init_proxy");
+    if (proxy != null && !force) {
+      debug("Proxy already initialised");
       return;
+    }
 
     this.proxy = new Rest.OAuthProxy (Settings.get_consumer_key (),
                                       Settings.get_consumer_secret (),
                                       "https://api.twitter.com/",
                                       false);
+    debug("Created proxy from settings");
     this.user_stream = new Cb.UserStream (this.screen_name, STRESSTEST);
+    debug("Created user stream");
     this.user_stream.register (this.event_receiver);
+    debug("Registered event receiver");
     if (load_secrets) {
+      debug("Loading secrets");
       init_database ();
       int n_rows = db.select ("common").cols ("token", "token_secret")
                                        .run ((vals) => {
         proxy.token = vals[0];
         proxy.token_secret = vals[1];
+        debug("Setting up proxy with secrets");
         user_stream.set_proxy_data (proxy.token, proxy.token_secret);
         return false; //stop
       });

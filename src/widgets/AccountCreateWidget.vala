@@ -45,10 +45,13 @@ class AccountCreateWidget : Gtk.Box {
   }
 
   public void open_pin_request_site () {
+    debug("enter open_pin_request_site");
     acc.init_proxy (false, true);
+    debug("Initialised proxy");
     
     acc.proxy.request_token_async.begin ("oauth/request_token", "oob", null, (obj, res) => {
       try {
+        debug("Completing async token request");
         acc.proxy.request_token_async.end (res);
       } catch (GLib.Error e) {
         if (e.message.down() == "unauthorized") {
@@ -72,6 +75,7 @@ class AccountCreateWidget : Gtk.Box {
         critical (e.message);
       }
     });
+    debug("Requested token");
   }
 
   [GtkCallback]
