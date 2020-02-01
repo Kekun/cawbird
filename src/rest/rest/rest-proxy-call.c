@@ -644,6 +644,7 @@ prepare_message (RestProxyCall *call, GError **error_out)
   GError *error = NULL;
 
   call_class = REST_PROXY_CALL_GET_CLASS (call);
+  g_debug("*** Preparing message ***");
 
   /* Emit a warning if the caller is re-using RestProxyCall objects */
   if (priv->url)
@@ -656,6 +657,7 @@ prepare_message (RestProxyCall *call, GError **error_out)
    */
   if (call_class->prepare)
   {
+    g_debug("Class has prepare function");
     if (!call_class->prepare (call, &error))
     {
       g_propagate_error (error_out, error);

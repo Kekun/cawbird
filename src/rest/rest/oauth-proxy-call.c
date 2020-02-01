@@ -183,7 +183,8 @@ sign_hmac (OAuthProxy *proxy, RestProxyCall *call, GHashTable *oauth_params)
 
   /* PLAINTEXT signature value is the HMAC-SHA1 key value */
   key = sign_plaintext (priv);
-
+  g_debug("Key: %s", key);
+  g_debug("Message text: %s", text->str);
   signature = hmac_sha1 (key, text->str);
 
   g_free (key);
@@ -260,6 +261,7 @@ _prepare (RestProxyCall *call, GError **error)
 
   g_object_get (call, "proxy", &proxy, NULL);
   priv = PROXY_GET_PRIVATE (proxy);
+  g_debug("OAauth Proxy Call _prepare");
 
   /* We have to make this hash free the strings and thus duplicate when we put
    * them in since when we call call steal_oauth_params that has to duplicate
@@ -271,18 +273,24 @@ _prepare (RestProxyCall *call, GError **error)
   steal_oauth_params (call, oauth_params);
 
   g_hash_table_insert (oauth_params, g_strdup ("oauth_version"), g_strdup ("1.0"));
+  g_debug("oauth_version: 1.0");
 
   s = g_strdup_printf ("%"G_GINT64_FORMAT , (gint64) time (NULL));
+  g_debug("oauth_timestamp: %s", s);
   g_hash_table_insert (oauth_params, g_strdup ("oauth_timestamp"), s);
 
   s = g_strdup_printf ("%u", g_random_int ());
+  g_debug("nonce: %s", s);
   g_hash_table_insert (oauth_params, g_strdup ("oauth_nonce"), s);
 
   g_hash_table_insert (oauth_params, g_strdup ("oauth_consumer_key"),
                        g_strdup (priv->consumer_key));
+  g_debug("oauth_consumer_key: %s", priv->consumer_key);
 
-  if (priv->token)
+  if (priv->token) {
     g_hash_table_insert (oauth_params, g_strdup ("oauth_token"), g_strdup (priv->token));
+    g_debug("oauth_token: %s", priv->token);
+  }
 
   switch (priv->method) {
   case PLAINTEXT:
@@ -291,7 +299,9 @@ _prepare (RestProxyCall *call, GError **error)
     break;
   case HMAC_SHA1:
     g_hash_table_insert (oauth_params, g_strdup ("oauth_signature_method"), g_strdup ("HMAC-SHA1"));
+    g_debug("Signing with hmac");
     s = sign_hmac (proxy, call, oauth_params);
+    g_debug("Signed with hmac");
     break;
   }
   g_hash_table_insert (oauth_params, g_strdup ("oauth_signature"), s);
