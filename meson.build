@@ -16,6 +16,7 @@ min_glib_version = '2.44'
 
 glib_dep = dependency('glib-2.0', version: '>=' + min_glib_version)
 gtk_dep  = dependency('gtk+-3.0', version: '>=3.22')
+libhandy_dep = dependency('libhandy-0.0', version: '>= 0.0.13')
 json_dep = dependency('json-glib-1.0')
 sql_dep  = dependency('sqlite3')
 soup_dep = dependency('libsoup-2.4')
@@ -23,6 +24,7 @@ soup_dep = dependency('libsoup-2.4')
 cb_deps = [
   glib_dep,
   gtk_dep,
+  libhandy_dep,
   json_dep,
   sql_dep,
   soup_dep,
@@ -219,6 +221,7 @@ cb_lib = static_library(
     '--gresources=' + meson.source_root() + '/cawbird.gresource.xml',
   ],
   c_args: [
+    '-DHANDY_USE_UNSTABLE_API',
     '-Werror=implicit-function-declaration'
   ]
 )
@@ -240,6 +243,9 @@ executable(
     meson.source_root() + '/vapi/cawbird-internal.vapi',
     meson.source_root() + '/vapi/rest-0.7.vapi',
     meson.source_root() + '/vapi/libtl.vapi',
+  ],
+  c_args: [
+    '-DHANDY_USE_UNSTABLE_API'
   ],
   install: true
 )

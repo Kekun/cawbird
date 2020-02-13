@@ -55,6 +55,11 @@ public class MainWidget : Gtk.Box {
     stack.set_vexpand (true);
     this.add (stack);
 
+    var view_switcher_bar = new Hdy.ViewSwitcherBar ();
+    view_switcher_bar.stack = stack;
+    view_switcher_bar.reveal = true;
+    this.add (view_switcher_bar);
+
     stack.add (stack_impostor);
 
     pages     = new IPage[11];
@@ -70,6 +75,34 @@ public class MainWidget : Gtk.Box {
     pages[9]  = new DMPage (Page.DM, account);
     pages[10] = new ListStatusesPage (Page.LIST_STATUSES, account);
 
+    string[] page_titles = {
+      "Home",
+      "Mentions",
+      "Favorites",
+      "Messages",
+      "Lists",
+      "Filter",
+      "Search",
+      "Profile",
+      "Tweet",
+      "Message",
+      "List",
+    };
+
+    string[] page_icon_names = {
+      "cawbird-user-home-symbolic",
+      "cawbird-mentions-symbolic",
+      "cawbird-favorite-symbolic",
+      "cawbird-dms-symbolic",
+      "view-list-symbolic",
+      "cawbird-filter-symbolic",
+      "cawbird-edit-find-symbolic",
+      "",
+      "",
+      "",
+      "",
+    };
+
     /* Initialize all containers */
     for (int i = 0; i < pages.length; i++) {
       IPage page = pages[i];
@@ -80,6 +113,7 @@ public class MainWidget : Gtk.Box {
 
       page.create_radio_button (dummy_button);
       stack.add (page);
+      stack.child_set (page, "title", page_titles[i], "icon-name", page_icon_names[i], null);
       if (page.get_radio_button () != null) {
         top_box.add (page.get_radio_button ());
         page.get_radio_button ().clicked.connect (() => {

@@ -20,6 +20,8 @@ int main (string[] args) {
   Gst.init (ref args);
 #endif
 
+  Hdy.init (ref args);
+
   //no initialisation of static fields :(
   Settings.init ();
   var cawbird = new Cawbird ();
